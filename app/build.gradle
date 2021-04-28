@@ -1,0 +1,49 @@
+plugins {
+    id 'application'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    implementation group: 'com.amazonaws', name: 'aws-lambda-java-core', version: '1.2.1'
+    implementation group: 'com.amazonaws', name: 'aws-lambda-java-events', version: '3.8.0'
+
+    implementation group: 'com.datadoghq', name: 'datadog-lambda-java', version: '0.2.4'
+
+    // slf4j
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+    implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '6.6'
+}
+
+task packageFat(type: Zip) {
+    from compileJava
+    from processResources
+    into('lib') {
+        from configurations.runtimeClasspath
+    }
+    dirMode = 0755
+    fileMode = 0755
+}
+
+task packageLibs(type: Zip) {
+    into('java/lib') {
+        from configurations.runtimeClasspath
+    }
+    dirMode = 0755
+    fileMode = 0755
+}
+
+task packageSkinny(type: Zip) {
+    from compileJava
+    from processResources
+}
+
+build.dependsOn packageSkinny
