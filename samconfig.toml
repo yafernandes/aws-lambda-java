@@ -1,0 +1,10 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "alexf-lambda-java"
+s3_bucket = "alexf-west-1"
+s3_prefix = "alexf-lambda-java"
+region = "us-west-1"
+confirm_changeset = false
+capabilities = "CAPABILITY_IAM"

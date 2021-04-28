@@ -1,0 +1,49 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: Java lambda function for lab purposes.
+Resources:
+  apigateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: alexf-lambda-java
+      StageName: lab
+      EndpointConfiguration: EDGE
+      Auth:
+        ApiKeyRequired: false
+      Domain:
+        DomainName: java-gw.aws.pipsquack.ca
+        CertificateArn: arn:aws:acm:us-west-1:601427279990:certificate/2bf708da-ab6f-4645-aafa-08ac928a0fab
+        Route53:
+          HostedZoneName: aws.pipsquack.ca.
+      Tags:
+        creator: alex.fernandes
+        env: lab
+  lambda:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      FunctionName: alexf-java
+      Handler: datadog.ese.Handler
+      Runtime: java8.al2
+      CodeUri: app/
+      MemorySize: 512
+      Timeout: 60
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            RestApiId: !Ref apigateway
+            Path: /hello
+            Method: GET
+      Environment:
+        Variables:
+          JAVA_TOOL_OPTIONS: -javaagent:/opt/java/lib/dd-java-agent.jar
+          DD_LOGS_INJECTION: "true"
+          DD_JMXFETCH_ENABLED: "false"
+          DD_TRACE_ENABLED: "true"
+      Tags:
+        creator: alex.fernandes
+        env: lab
+        service: alexf-lambda-java
+        version: 0.1
+      Layers:
+        - arn:aws:lambda:us-west-1:464622532012:layer:dd-trace-java:2
